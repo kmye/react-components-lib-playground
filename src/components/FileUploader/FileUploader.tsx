@@ -1,4 +1,4 @@
-import React, { useId, useState, DragEvent } from "react";
+import React, { useId, useState, DragEvent, useCallback } from "react";
 import styled, { css } from "styled-components";
 
 export interface FileUploaderProps
@@ -23,12 +23,19 @@ const FileUploader = React.forwardRef<HTMLInputElement, FileUploaderProps>(
       console.log(e.dataTransfer);
     };
 
+    const openFileDialog = useCallback(() => {
+      window.showOpenFilePicker().then((handles) => {
+        console.log(handles);
+      });
+    }, []);
+
     return (
       <div
         onDrop={handleOnDrop}
         onDragOver={handleOnDragOver}
         onMouseOver={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={openFileDialog}
       >
         <HiddenFileInput id={uniqueId} type="file" ref={ref} />
         <Container $isHovered={isHovered}>{children}</Container>
