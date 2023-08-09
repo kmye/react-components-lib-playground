@@ -1,16 +1,58 @@
-import React from 'react';
+import React, { useId, useState, DragEvent } from 'react';
+import styled, { css } from 'styled-components';
 
-const FileUploader: React.FC = () => {
-  const handleOnDrop = () => {
-
-  };
-
-  const handleOnDragOver = () => {
-  };
-
-  return (<div onDrop={handleOnDrop} onDragOver={handleOnDragOver}>
-    <div>This is a container</div>
-  </div>);
+export interface FileUploaderProps extends Omit<React.ComponentPropsWithoutRef<'input'>, 'disabled' | 'onDrop'> {
+  id?: string;
+  onDrop?: (dataTransfer: DataTransfer) => void;
 }
 
+const FileUploader = React.forwardRef<HTMLInputElement, FileUploaderProps>(({ id, onDrop, children }, ref) => {
+  const uniqueId = useId() || id;
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleOnDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    console.log(e.dataTransfer);
+    onDrop?.(e.dataTransfer);
+  };
+
+  const handleOnDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    console.log(e.dataTransfer);
+  };
+
+  return (<div
+    onDrop={handleOnDrop}
+    onDragOver={handleOnDragOver}
+    onMouseOver={() => setIsHovered(true)}
+    onMouseLeave={() => setIsHovered(false)}>
+    <HiddenFileInput id={uniqueId} type="file" ref={ref} />
+    <Container $isHovered={isHovered}>{children}</Container>
+  </div>);
+})
+
+FileUploader.displayName = 'FileUplaoder';
+
 export default FileUploader;
+
+const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+type ContainerProps = {
+  $isHovered: boolean;
+}
+
+const Container = styled.div <ContainerProps>`
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  vertical-align: middle;
+
+  ${({ $isHovered }) => {
+    if ($isHovered) {
+      return css`border: 1px dashed blue;`
+    } else {
+      return css`border: 1px dashed #d9d9d9;`
+    }
+  }}
+`;

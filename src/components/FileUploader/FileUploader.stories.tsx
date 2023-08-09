@@ -13,5 +13,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    children: 'Drag and Drop files here to upload or click on me'
   },
 };
